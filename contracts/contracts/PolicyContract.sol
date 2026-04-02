@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "../interfaces/IAccess.sol";
-import "../interfaces/IPolicy.sol";
+
+import "./interfaces/IAccess.sol";
+import "./interfaces/IPolicy.sol";
 
 contract PolicyContract is IPolicy {
 
@@ -50,7 +51,7 @@ modifier onlyInsurer() {
     modifier onlyPatient() {
         require(accessControl.isActive(msg.sender), "Utilisateur inactif");
         require(
-            accessControl.checkRole(msg.sender) == AccessControl.Role.Patient,
+            accessControl.checkRole(msg.sender) == IAccess.Role.Patient,
             "Reserve au patient"
         );
         _;
@@ -67,7 +68,7 @@ modifier onlyInsurer() {
     }
 
     modifier onlyClaimContract() {
-    require(msg.sender == claimContract, "Reservé au ClaimContract");
+    require(msg.sender == claimContract, "Reserve au ClaimContract");
     _;
 }
 
@@ -98,10 +99,11 @@ modifier onlyInsurer() {
     ) external onlyInsurer {
         require(_patient != address(0), "Adresse invalide");
         require(_coverageAmount > 0, "Couverture invalide");
+        require(_coverageRate > 0 && _coverageRate <= 100, "Couverture invalide");
         require(_durationDays > 0, "Duree invalide");
         require(accessControl.isActive(_patient), "Patient inactif");
         require(
-            accessControl.checkRole(_patient) == AccessControl.Role.Patient,
+            accessControl.checkRole(_patient) == IAccess.Role.Patient,
             "L'adresse n'est pas un patient"
         );
 

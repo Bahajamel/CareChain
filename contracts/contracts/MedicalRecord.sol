@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "../interfaces/IAccess.sol";
+import "./interfaces/IAccess.sol";
 
 contract MedicalRecord {
 
@@ -76,6 +76,23 @@ contract MedicalRecord {
         _;
     }
 
+
+    event MedicalRecordAdded(
+        uint256 indexed recordId,
+        address indexed patient,
+        address indexed doctor,
+        string  ipfsHash,
+        bytes32 fileHash,
+        RecordType recordType,
+        uint256 timestamp
+    );
+
+event MedicalRecordRevoked(
+        uint256 indexed recordId,
+        address indexed revokedBy,
+        uint256 timestamp
+    );
+    
     // ─────────────────────────────────────────
     //  CONSTRUCTOR
     // ─────────────────────────────────────────

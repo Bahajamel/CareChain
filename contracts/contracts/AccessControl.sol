@@ -1,16 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
-import "../interfaces/IAccess.sol";
+import "./interfaces/IAccess.sol";
 
 contract AccessControl is IAccess {
      
      mapping(address => Role) public roles;
      mapping(address => bool) public isActive;
-
-
-     event UserRegistered(address indexed user, Role role);
-     event RoleChanged(address indexed user, Role oldRole, Role newRole);
-     event UserStatusChanged(address indexed user, bool active);
 
 
    constructor() {
@@ -22,7 +17,7 @@ contract AccessControl is IAccess {
     // Modifier pour restreindre l'accès à un rôle spécifique
     modifier onlyRole(Role _role) {
         require(isActive[msg.sender], "Utilisateur inactif");
-        require(roles[msg.sender] == _role, "Accès refuse pour ce rôle");
+        require(roles[msg.sender] == _role, "Acces refuse pour ce role");
         _;
     }
 

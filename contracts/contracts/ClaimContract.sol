@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "../interfaces/IAccess.sol";
-import "../interfaces/IPolicy.sol";
-import "../interfaces/IMedical.sol";
+import "./interfaces/IAccess.sol";
+import "./interfaces/IPolicy.sol";
+import "./interfaces/IMedical.sol";
 
 
 contract ClaimContract {
