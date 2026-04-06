@@ -19,6 +19,12 @@ export default defineConfig({
       },
     },
   },
+   paths: {
+    sources:   "./contracts",
+    tests:     "./test",
+    cache:     "./cache",
+    artifacts: "./artifacts",
+  },
   networks: {
     hardhatMainnet: {
       type: "edr-simulated",
