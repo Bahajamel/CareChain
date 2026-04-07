@@ -1,0 +1,524 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_accessControl",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "CoverageUsed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "PolicyCancelled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "insurer",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        }
+      ],
+      "name": "PolicyCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "PolicyExpired",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "accessControl",
+      "outputs": [
+        {
+          "internalType": "contract IAccess",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "cancelPolicy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimContract",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_patient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_coverageAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_coverageRate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_durationDays",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum PolicyContract.CareType",
+          "name": "_careType",
+          "type": "uint8"
+        }
+      ],
+      "name": "createPolicy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_insurer",
+          "type": "address"
+        }
+      ],
+      "name": "getInsurerPolicies",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_patient",
+          "type": "address"
+        }
+      ],
+      "name": "getPatientPolicies",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPolicy",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "insurer",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "patient",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "coverageAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "usedAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "coverageRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum PolicyContract.CareType",
+              "name": "careType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum PolicyContract.PolicyStatus",
+              "name": "status",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct PolicyContract.Policy",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPolicyCoverageRate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPolicyInsurer",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPolicyMaxAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPolicyPatient",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRemainingCoverage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "insurerPolicies",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        }
+      ],
+      "name": "isPolicyActive",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "patientPolicies",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "policies",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "insurer",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "coverageAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usedAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "coverageRate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum PolicyContract.CareType",
+          "name": "careType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum PolicyContract.PolicyStatus",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_claimContract",
+          "type": "address"
+        }
+      ],
+      "name": "setClaimContract",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_policyId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "useCoverage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "address": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0"
+}

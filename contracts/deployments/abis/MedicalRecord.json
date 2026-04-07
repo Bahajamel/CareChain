@@ -1,0 +1,291 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_accessControl",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "doctor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "ipfsHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "fileHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum MedicalRecord.RecordType",
+          "name": "recordType",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "MedicalRecordAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "revokedBy",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "MedicalRecordRevoked",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "accessControl",
+      "outputs": [
+        {
+          "internalType": "contract IAccess",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "ipfsHash",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "fileHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "enum MedicalRecord.RecordType",
+          "name": "recordType",
+          "type": "uint8"
+        }
+      ],
+      "name": "addRecord",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        }
+      ],
+      "name": "getPatientRecords",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRecord",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "patient",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "doctor",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "ipfsHash",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "fileHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "enum MedicalRecord.RecordType",
+              "name": "recordType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isValid",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct MedicalRecord.Record",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "patient",
+          "type": "address"
+        }
+      ],
+      "name": "isRecordValid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        }
+      ],
+      "name": "revokeRecord",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalRecords",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "fileHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "verifyFileHash",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e"
+}
