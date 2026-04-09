@@ -18,16 +18,10 @@ export function useUserRole() {
 
     setLoading(true);
 
-    const fetchRole = async () => {
+const fetchRole = async () => {
   try {
     const r = await accessControl.checkRole(address);
-    const roleNumber = Number(r);
-
-    if (roleNumber === 0) {
-      setRole(null); // Non enregistré
-    } else {
-      setRole(roleNumber);
-    }
+    setRole(Number(r)); 
   } catch (e) {
     console.error("Erreur récupération rôle:", e);
     setRole(null);

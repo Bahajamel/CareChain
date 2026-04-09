@@ -32,7 +32,6 @@ console.log("ClaimContract address:", ClaimContractABI.address);
 
 // Mapping des rôles (correspond à l'enum Role dans IAccess.sol)
 export const ROLES = {
-  0: "None",
   1: "Admin",
   2: "Patient",
   3: "Doctor",
