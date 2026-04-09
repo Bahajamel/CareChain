@@ -14,13 +14,13 @@ export default function DashboardRouter() {
   if (role === null) return <p>Utilisateur non enregistré</p>;
 
   switch (role) {
-    case 1:
+    case 0:
       return <AdminDashboard />;
-    case 2:
+    case 1:
       return <PatientDashboard />;
-    case 3:
+    case 2:
       return <DoctorDashboard />;
-    case 4:
+    case 3:
       return <InsurerDashboard />;
     default:
       return <p>Rôle inconnu</p>;
