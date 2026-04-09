@@ -1,31 +1,43 @@
-import { useState, useEffect } from "react";
-import { uploadMedicalRecord } from "../api/client.js";
-import { useWallet } from "../context/WalletContext.jsx";
+import { useState, useEffect }    from "react";
+import { uploadMedicalRecord }    from "../api/client.js";
+import { useWallet }              from "../context/WalletContext.jsx";
+import { useMedicalRecord }       from "../hooks/useContract.js";
 
-/**
- * Formulaire prestataire : envoi au backend (IPFS + métadonnées).
- * parent peut passer onSuccess(apiResponse, formSnapshot)
- */
+// Mapping actType → RecordType enum du smart contract
+const RECORD_TYPE_MAP = {
+  "Consultation":  0,
+  "Prescription":  1,
+  "LabResult":     2,
+  "Imaging":       3,
+  "Surgery":       4,
+  "Other":         5,
+};
+
 export default function UploadMedicalRecord({ onSuccess }) {
-  const { address } = useWallet();
+  const { address }      = useWallet();
+  const medicalRecord    = useMedicalRecord();
+  // ↑ instance du contrat MedicalRecord signé par MetaMask
+
   const [form, setForm] = useState({
-    patientAddress: "",
+    patientAddress:  "",
     providerAddress: "",
-    actType: "",
-    amount: "",
+    actType:         "Consultation",
+    amount:          "",
   });
-  const [file, setFile] = useState(null);
+  const [file,    setFile]    = useState(null);
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState(null);
+  const [step,    setStep]    = useState("");
+  // ↑ message d'étape pour l'utilisateur
+  const [err,     setErr]     = useState(null);
 
   useEffect(() => {
     if (address) {
-      setForm((f) => ({ ...f, providerAddress: address }));
+      setForm(f => ({ ...f, providerAddress: address }));
     }
   }, [address]);
 
   function setField(name, value) {
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm(f => ({ ...f, [name]: value }));
   }
 
   async function onSubmit(e) {
@@ -35,35 +47,95 @@ export default function UploadMedicalRecord({ onSuccess }) {
       return;
     }
     if (!form.providerAddress.trim()) {
-      setErr("Adresse prestataire requise (connectez le portefeuille ou saisissez-la).");
+      setErr("Adresse prestataire requise.");
       return;
     }
+    if (!medicalRecord) {
+      setErr("Contrat MedicalRecord non disponible.");
+      return;
+    }
+
     setLoading(true);
     setErr(null);
+
     try {
-      const data = await uploadMedicalRecord(form, file);
-      console.log("UPLOAD RESULT:", result);
-      const snapshot = { ...form };
-      onSuccess?.(data, snapshot);
+      // ── ETAPE 1 : Upload IPFS via backend ──────────────────
+      setStep("📤 Upload du document sur IPFS...");
+      const result = await uploadMedicalRecord(form, file);
+      const { documentCid, fileHash } = result.data;
+
+      // ✅ S'assurer que fileHash a le préfixe 0x
+    const fileHashBytes32 = fileHash.startsWith("0x") 
+  ? fileHash 
+  : `0x${fileHash}`;
+
+      console.log("IPFS upload OK :", documentCid);
+      console.log("fileHash       :", fileHash);
+
+      // ── ETAPE 2 : Appel addRecord() via MetaMask ───────────
+      setStep("⛓️ Enregistrement sur la blockchain (MetaMask)...");
+
+      const recordType = RECORD_TYPE_MAP[form.actType] ?? 5;
+      // ↑ convertit "Consultation" → 0, "Prescription" → 1, etc.
+
+      const tx = await medicalRecord.addRecord(
+        form.patientAddress.trim(), // adresse du patient
+        documentCid,                // ipfsHash
+        fileHashBytes32,                   // fileHash keccak256
+        recordType                  // enum RecordType
+      );
+      // ↑ MetaMask s'ouvre et demande confirmation au Doctor
+
+      setStep("⏳ Transaction en cours de validation...");
+      const receipt = await tx.wait();
+      // ↑ attend que la transaction soit minée
+
+      console.log("Transaction minée :", receipt.hash);
+
+      // ── ETAPE 3 : Récupérer le recordId depuis l'event ─────
+      const iface    = medicalRecord.interface;
+      const event    = receipt.logs
+        .map(log => { try { return iface.parseLog(log); } catch { return null; } })
+        .filter(Boolean)
+        .find(e => e.name === "MedicalRecordAdded");
+
+      const recordId = event?.args?.recordId?.toString() ?? null;
+
+      setStep("✅ Dossier médical enregistré !");
+
+      // ── ETAPE 4 : Notifier le parent ───────────────────────
+      onSuccess?.({
+        ...result,
+        data: {
+          ...result.data,
+          recordId,
+          txHash:      receipt.hash,
+          blockNumber: receipt.blockNumber.toString(),
+        }
+      }, { ...form });
+
     } catch (e) {
-      setErr(e.message || "Échec de l’envoi au backend.");
+      console.error("Erreur upload:", e);
+      setErr(
+        e.reason ||           // message du smart contract
+        e.shortMessage ||     // message court ethers
+        e.message ||          // message générique
+        "Échec de l'envoi."
+      );
     } finally {
       setLoading(false);
+      setStep("");
     }
   }
 
   return (
     <form className="mvp-form" onSubmit={onSubmit}>
+
       <label className="mvp-label">Adresse patient (wallet)</label>
-      <p className="mvp-form-hint">
-        À saisir pour la personne concernée. En démo solo : utilisez le bouton
-        ci-dessous pour mettre votre propre adresse et voir le dossier dans
-        l’onglet Patient.
-      </p>
       <input
         className="mvp-input"
         value={form.patientAddress}
-        onChange={(e) => setField("patientAddress", e.target.value)}
+        onChange={e => setField("patientAddress", e.target.value)}
         placeholder="0x…"
         autoComplete="off"
         required
@@ -74,61 +146,63 @@ export default function UploadMedicalRecord({ onSuccess }) {
           className="mvp-btn mvp-btn--ghost mvp-btn--small mvp-btn--block"
           onClick={() => setField("patientAddress", address)}
         >
-          Remplir avec mon portefeuille (test patient)
+          Utiliser mon adresse (test)
         </button>
       )}
 
       <label className="mvp-label">Adresse prestataire (wallet)</label>
-      <p className="mvp-form-hint">
-        Pré-remplie avec votre portefeuille : c’est le médecin / établissement
-        qui envoie l’acte au backend.
-      </p>
       <input
         className="mvp-input"
         value={form.providerAddress}
-        onChange={(e) => setField("providerAddress", e.target.value)}
+        onChange={e => setField("providerAddress", e.target.value)}
         placeholder="0x…"
         autoComplete="off"
         required
       />
 
-      <label className="mvp-label">Type d&apos;acte</label>
-      <input
+      <label className="mvp-label">Type d'acte</label>
+      <select
         className="mvp-input"
         value={form.actType}
-        onChange={(e) => setField("actType", e.target.value)}
-        placeholder="Consultation, imagerie…"
-        required
-      />
+        onChange={e => setField("actType", e.target.value)}
+      >
+        {Object.keys(RECORD_TYPE_MAP).map(type => (
+          <option key={type} value={type}>{type}</option>
+        ))}
+      </select>
 
-      <label className="mvp-label">Montant</label>
+      <label className="mvp-label">Montant (€)</label>
       <input
         className="mvp-input"
         type="number"
         min="0"
         step="any"
         value={form.amount}
-        onChange={(e) => setField("amount", e.target.value)}
+        onChange={e => setField("amount", e.target.value)}
         required
       />
 
-      <label className="mvp-label">Document (PDF, PNG, JPEG — max 5 Mo)</label>
+      <label className="mvp-label">
+        Document (PDF, PNG, JPEG — max 5 Mo)
+      </label>
       <input
         type="file"
-        accept=".pdf,.png,.jpg,.jpeg,image/png,image/jpeg,application/pdf"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
+        accept=".pdf,.png,.jpg,.jpeg"
+        onChange={e => setFile(e.target.files?.[0] || null)}
         required
       />
 
-      {err && <p className="mvp-error">{err}</p>}
+      {step && <p style={{ color: "blue" }}>{step}</p>}
+      {err  && <p className="mvp-error">{err}</p>}
 
       <button
         type="submit"
         className="mvp-btn mvp-btn--primary"
-        disabled={loading}
+        disabled={loading || !medicalRecord}
       >
-        {loading ? "Envoi au backend…" : "Envoyer au backend (IPFS)"}
+        {loading ? step || "En cours..." : "Envoyer le dossier médical"}
       </button>
+
     </form>
   );
 }

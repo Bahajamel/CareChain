@@ -5,7 +5,8 @@ import { CONTRACTS }    from "../config/contracts";
 import { useWallet }    from "../context/WalletContext";
 
 export function useContract(contractKey) {
-  const { signer, provider } = useWallet();
+  const { signer, provider} = useWallet();
+
   signer.provider.getNetwork().then(n => 
   console.log(`ChainId actuel: ${n.chainId}`) 
 );
