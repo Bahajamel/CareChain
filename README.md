@@ -101,3 +101,169 @@ Blockchain (Smart Contracts)
 - Ethereum-compatible network  
 
 
+
+```
+CareChain
+├─ .sfdx
+│  ├─ tools
+│  │  ├─ sobjects
+│  │  │  └─ standardObjects
+│  │  │     ├─ Account.cls
+│  │  │     ├─ AccountHistory.cls
+│  │  │     ├─ Asset.cls
+│  │  │     ├─ Attachment.cls
+│  │  │     ├─ Case.cls
+│  │  │     ├─ Contact.cls
+│  │  │     ├─ Contract.cls
+│  │  │     ├─ Domain.cls
+│  │  │     ├─ Lead.cls
+│  │  │     ├─ Note.cls
+│  │  │     ├─ Opportunity.cls
+│  │  │     ├─ Order.cls
+│  │  │     ├─ Pricebook2.cls
+│  │  │     ├─ PricebookEntry.cls
+│  │  │     ├─ Product2.cls
+│  │  │     ├─ RecordType.cls
+│  │  │     ├─ Report.cls
+│  │  │     ├─ Task.cls
+│  │  │     └─ User.cls
+│  │  └─ soqlMetadata
+│  │     ├─ standardObjects
+│  │     │  ├─ Account.json
+│  │     │  ├─ AccountHistory.json
+│  │     │  ├─ Asset.json
+│  │     │  ├─ Attachment.json
+│  │     │  ├─ Case.json
+│  │     │  ├─ Contact.json
+│  │     │  ├─ Contract.json
+│  │     │  ├─ Domain.json
+│  │     │  ├─ Lead.json
+│  │     │  ├─ Note.json
+│  │     │  ├─ Opportunity.json
+│  │     │  ├─ Order.json
+│  │     │  ├─ Pricebook2.json
+│  │     │  ├─ PricebookEntry.json
+│  │     │  ├─ Product2.json
+│  │     │  ├─ RecordType.json
+│  │     │  ├─ Report.json
+│  │     │  ├─ Task.json
+│  │     │  └─ User.json
+│  │     └─ typeNames.json
+│  └─ typings
+│     └─ lwc
+│        └─ sobjects
+│           ├─ Account.d.ts
+│           ├─ AccountHistory.d.ts
+│           ├─ Asset.d.ts
+│           ├─ Attachment.d.ts
+│           ├─ Case.d.ts
+│           ├─ Contact.d.ts
+│           ├─ Contract.d.ts
+│           ├─ Domain.d.ts
+│           ├─ Lead.d.ts
+│           ├─ Note.d.ts
+│           ├─ Opportunity.d.ts
+│           ├─ Order.d.ts
+│           ├─ Pricebook2.d.ts
+│           ├─ PricebookEntry.d.ts
+│           ├─ Product2.d.ts
+│           ├─ RecordType.d.ts
+│           ├─ Report.d.ts
+│           ├─ Task.d.ts
+│           └─ User.d.ts
+├─ back-end
+│  ├─ .env
+│  ├─ .env.example
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ server.js
+│  ├─ src
+│  │  ├─ app.js
+│  │  ├─ config
+│  │  │  ├─ contracts.js
+│  │  │  ├─ env.js
+│  │  │  └─ index.js
+│  │  ├─ controllers
+│  │  │  ├─ files.controller.js
+│  │  │  └─ medicalRecords.controller.js
+│  │  ├─ middlewares
+│  │  │  ├─ apiKey.middleware.js
+│  │  │  ├─ error.middleware.js
+│  │  │  └─ upload.middleware.js
+│  │  ├─ routes
+│  │  │  ├─ files.routes.js
+│  │  │  └─ medicalRecords.routes.js
+│  │  ├─ services
+│  │  │  ├─ blockchain.service.js
+│  │  │  └─ ipfs.service.js
+│  │  └─ utils
+│  │     └─ AppError.js
+│  └─ uploads
+├─ blockchain_health_insurance_roadmap.pdf
+├─ cahier_des_charges_carechain.pdf
+├─ contracts
+│  ├─ contracts
+│  │  ├─ AccessControl.sol
+│  │  ├─ ClaimContract.sol
+│  │  ├─ interfaces
+│  │  │  ├─ IAccess.sol
+│  │  │  ├─ IMedical.sol
+│  │  │  └─ IPolicy.sol
+│  │  ├─ MedicalRecord.sol
+│  │  └─ PolicyContract.sol
+│  ├─ deployments
+│  │  ├─ abis
+│  │  │  ├─ AccessControl.json
+│  │  │  ├─ ClaimContract.json
+│  │  │  ├─ MedicalRecord.json
+│  │  │  └─ PolicyContract.json
+│  │  └─ deployment.json
+│  ├─ hardhat.config.ts
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ README.md
+│  ├─ scripts
+│  │  └─ deploy.ts
+│  ├─ test
+│  │  ├─ access.test.ts
+│  │  ├─ claim.test.ts
+│  │  ├─ medicalRecord.test.ts
+│  │  ├─ policy.test.ts
+│  │  └─ workflow.test.ts
+│  └─ tsconfig.json
+├─ front-end
+│  ├─ .env.example
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ src
+│  │  ├─ api
+│  │  │  └─ client.js
+│  │  ├─ App.jsx
+│  │  ├─ config
+│  │  │  └─ contracts.js
+│  │  ├─ context
+│  │  │  ├─ App.jsx
+│  │  │  ├─ ClaimsContext.jsx
+│  │  │  └─ WalletContext.jsx
+│  │  ├─ hooks
+│  │  │  ├─ useContract.js
+│  │  │  └─ useUserRole.js
+│  │  ├─ index.css
+│  │  ├─ layout
+│  │  │  └─ MvpLayout.jsx
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AdminDashboard.jsx
+│  │  │  ├─ DashboardRouter.jsx
+│  │  │  ├─ InsurerDashboard.jsx
+│  │  │  ├─ PatientDashboard.jsx
+│  │  │  ├─ ProviderDashboard.jsx
+│  │  │  ├─ UploadMedicalRecord.jsx
+│  │  │  └─ WalletConnectPage.jsx
+│  │  └─ web3
+│  └─ vite.config.js
+├─ README.md
+└─ scripts
+
+```

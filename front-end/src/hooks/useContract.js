@@ -6,26 +6,30 @@ import { useWallet }    from "../context/WalletContext";
 
 export function useContract(contractKey) {
   const { signer, provider } = useWallet();
-
+  signer.provider.getNetwork().then(n => 
+  console.log(`ChainId actuel: ${n.chainId}`) 
+);
   return useMemo(() => {
     const config = CONTRACTS[contractKey];
     if (!config) throw new Error(`Contrat inconnu : ${contractKey}`);
 
     if (signer) {
-      // ✅ signer disponible → lecture + écriture
+      //  signer disponible → lecture + écriture
       return new Contract(config.address, config.abi, signer);
     }
 
     if (provider) {
-      // ✅ provider seul → lecture uniquement
+      //  provider seul → lecture uniquement
       return new Contract(config.address, config.abi, provider);
     }
 
-    // ❌ ni signer ni provider → null
+    //  ni signer ni provider → null
     return null;
 
   }, [signer, provider, contractKey]);
 }
+
+
 
 export function useAccessControl()  { return useContract("accessControl");  }
 export function useMedicalRecord()  { return useContract("medicalRecord");  }

@@ -6,6 +6,7 @@ import MedicalRecordABI  from "../../../contracts/deployments/abis/MedicalRecord
 import PolicyContractABI from "../../../contracts/deployments/abis/PolicyContract.json";
 import ClaimContractABI  from "../../../contracts/deployments/abis/ClaimContract.json";
 
+
 export const CONTRACTS = {
   accessControl: {
     address: AccessControlABI.address,
@@ -24,11 +25,16 @@ export const CONTRACTS = {
     abi:     ClaimContractABI.abi,
   },
 };
+console.log("AccessControl address:", AccessControlABI.address);
+console.log("MedicalRecord address:", MedicalRecordABI.address);
+console.log("PolicyContract address:", PolicyContractABI.address);
+console.log("ClaimContract address:", ClaimContractABI.address);
 
 // Mapping des rôles (correspond à l'enum Role dans IAccess.sol)
 export const ROLES = {
-  0: "Admin",
-  1: "Patient",
-  2: "Doctor",
-  3: "Insurer",
+  0: "None",
+  1: "Admin",
+  2: "Patient",
+  3: "Doctor",
+  4: "Insurer",
 };

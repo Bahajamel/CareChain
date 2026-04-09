@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 interface IAccess {
 
     // ─── Enum ────────────────────────────────────────────────
-    enum Role { Admin, Patient, Doctor, Insurer }
+enum Role { None, Admin, Patient, Doctor, Insurer }
 
     // ─── Fonctions de lecture de base ────────────────────────
     function checkRole(address _user) external view returns (Role);

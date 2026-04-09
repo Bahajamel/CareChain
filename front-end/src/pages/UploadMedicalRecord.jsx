@@ -42,6 +42,7 @@ export default function UploadMedicalRecord({ onSuccess }) {
     setErr(null);
     try {
       const data = await uploadMedicalRecord(form, file);
+      console.log("UPLOAD RESULT:", result);
       const snapshot = { ...form };
       onSuccess?.(data, snapshot);
     } catch (e) {
