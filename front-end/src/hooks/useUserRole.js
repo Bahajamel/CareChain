@@ -12,23 +12,29 @@ export function useUserRole() {
   useEffect(() => {
     // Réinitialise le loading si address/contrat change
     if (!address || !accessControl) {
+      setRole(null);
       setLoading(false);
       return;
     }
 
     setLoading(true);
 
-const fetchRole = async () => {
-  try {
-    const r = await accessControl.checkRole(address);
-    setRole(Number(r)); 
-  } catch (e) {
-    console.error("Erreur récupération rôle:", e);
-    setRole(null);
-  } finally {
-    setLoading(false);
-  }
-};
+    const fetchRole = async () => {
+      try {
+        const active = await accessControl.isActive(address);
+        if (!active) {
+          setRole(null);
+          return;
+        }
+        const r = await accessControl.checkRole(address);
+        setRole(Number(r));
+      } catch (e) {
+        console.error("Erreur récupération rôle:", e);
+        setRole(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchRole();
   }, [address, accessControl]);

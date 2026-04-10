@@ -1,14 +1,19 @@
 // src/hooks/useContract.js
-import { useMemo }      from "react";
-import { Contract }     from "ethers";
-import { CONTRACTS }    from "../config/contracts";
-import { useWallet }    from "../context/WalletContext";
+import { useEffect, useMemo } from "react";
+import { Contract } from "ethers";
+import { CONTRACTS } from "../config/contracts";
+import { useWallet } from "../context/WalletContext";
 
 export function useContract(contractKey) {
   const { signer, provider } = useWallet();
-  signer.provider.getNetwork().then(n => 
-  console.log(`ChainId actuel: ${n.chainId}`) 
-);
+
+  useEffect(() => {
+    if (!signer?.provider) return;
+    signer.provider.getNetwork().then((n) => {
+      console.log(`ChainId actuel: ${n.chainId}`);
+    });
+  }, [signer]);
+
   return useMemo(() => {
     const config = CONTRACTS[contractKey];
     if (!config) throw new Error(`Contrat inconnu : ${contractKey}`);
