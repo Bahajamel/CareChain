@@ -112,7 +112,7 @@ export default function UploadMedicalRecord({ onSuccess }) {
 
       const recordId = event?.args?.recordId?.toString() ?? null;
 
-      setStep("✅ Dossier médical enregistré !");
+      setStep(" Dossier médical enregistré !");
 
     
       onSuccess?.({

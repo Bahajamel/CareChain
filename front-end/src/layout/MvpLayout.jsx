@@ -12,7 +12,20 @@ export default function MvpLayout() {
   return (
     <div className="mvp">
       <header className="mvp-nav">
-        <div className="mvp-nav__brand">CareChain — MVP</div>
+        <div className="mvp-nav__brand">
+          <div className="mvp-logo">
+            <svg className="mvp-logo__svg" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 2L4 9L16 16L28 9L16 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <path d="M4 9V23L16 30L28 23V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <path d="M16 16V30" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M10 12L16 8L22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="16" cy="21" r="2" fill="currentColor"/>
+              <path d="M12 24L14 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M20 24L18 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <span>CareChain</span>
+        </div>
         <nav className="mvp-nav__links" aria-label="Rôles">
           <NavLink
             to="/patient"

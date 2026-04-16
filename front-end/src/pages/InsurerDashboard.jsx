@@ -180,8 +180,11 @@ export default function InsurerDashboard() {
 
   return (
     <div className="mvp-page">
-      <h1 className="mvp-page__title">Espace assureur</h1>
+      <h1 className="mvp-page__title">
+        <span className="mvp-page__icon">🏛️</span>
+        Espace assureur</h1>
       <p className="mvp-page__intro">
+
         Créez des polices pour des patients enregistrés, puis traitez les{" "}
         <strong>demandes de remboursement (claims)</strong> enregistrées sur la
         chaîne — pas les dossiers médicaux bruts.

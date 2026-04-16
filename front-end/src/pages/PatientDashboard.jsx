@@ -249,7 +249,8 @@ export default function PatientDashboard() {
 
   return (
     <div className="mvp-page">
-      <h1 className="mvp-page__title">Espace patient</h1>
+      <h1 className="mvp-page__title">
+        <span className="mvp-page__icon">👤</span>Espace patient</h1>
       <p className="mvp-page__intro">
         Consultez vos <strong>polices</strong> créées par votre assureur, vos dossiers
         médicaux enregistrés par un praticien, et soumettez une{" "}
@@ -494,4 +495,3 @@ function claimStatusClass(status) {
   return "pending";
 }
 
-// eurosToCentimes est maintenant centralisé dans insuranceUi.js
