@@ -54,9 +54,7 @@ contract ClaimContract {
     // évite la double soumission d'un même dossier médical sur la même police
     mapping(uint256 => mapping(uint256 => bool)) private claimExists; // policyId => recordId => bool
 
-    // ─────────────────────────────────────────
-    //  EVENTS
-    // ─────────────────────────────────────────
+   
 
     event ClaimSubmitted(
         uint256 indexed claimId,
@@ -87,9 +85,7 @@ contract ClaimContract {
         uint256 timestamp
     );
 
-    // ─────────────────────────────────────────
-    //  MODIFIERS
-    // ─────────────────────────────────────────
+  
 
     modifier onlyInsurer() {
         require(accessControl.isInsurer(msg.sender), "ClaimContract: caller is not an insurer");
@@ -111,9 +107,7 @@ contract ClaimContract {
         _;
     }
 
-    // ─────────────────────────────────────────
-    //  CONSTRUCTOR
-    // ─────────────────────────────────────────
+
 
     constructor(
         address _accessControl,
@@ -129,9 +123,7 @@ contract ClaimContract {
         medicalContract = IMedical(_medicalContract);
     }
 
-    // ─────────────────────────────────────────
-    //  WRITE FUNCTIONS
-    // ─────────────────────────────────────────
+  
 
     /**
      * @notice Le patient soumet une demande de remboursement.
@@ -148,7 +140,6 @@ contract ClaimContract {
         onlyPatient
         returns (uint256)
     {
-        // ── Vérifications ──────────────────────────────────────────
         require(amountRequested > 0, "ClaimContract: amount must be > 0");
 
         // 1. La police existe et est active
@@ -175,7 +166,6 @@ contract ClaimContract {
         // ── Calcul du remboursement ─────────────────────────────────
         uint256 amountApproved = _calculateReimbursement(policyId, amountRequested);
 
-        // ── Création de la claim ───────────────────────────────────
         _claimCounter++;
         uint256 newId = _claimCounter;
 
@@ -265,9 +255,7 @@ contract ClaimContract {
         emit ClaimRejected(claimId, msg.sender, reason, block.timestamp);
     }
 
-    // ─────────────────────────────────────────
-    //  INTERNAL — CALCUL REMBOURSEMENT
-    // ─────────────────────────────────────────
+  
 
     /**
      * @dev Calcule le montant remboursable selon les règles de la police :
@@ -295,9 +283,7 @@ contract ClaimContract {
         return eligible < remainingCoverage ? eligible : remainingCoverage;
     }
 
-    // ─────────────────────────────────────────
-    //  READ FUNCTIONS
-    // ─────────────────────────────────────────
+
 
     /**
      * @notice Retourne une claim complète.

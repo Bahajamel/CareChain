@@ -21,14 +21,36 @@ export default function WalletConnectPage() {
               Utilisez MetaMask (ou un wallet compatible EIP-1193) sur le réseau
               de test convenu avec votre équipe.
             </p>
-            {error && <p className="mvp-error">{error}</p>}
+            {error && (
+              <div className="mvp-card mvp-card--warn mvp-mt" role="alert">
+                <p className="mvp-error mvp-error--flush">{error}</p>
+                {/wallet|metamask|aucun portefeuille/i.test(error) && (
+                  <p className="mvp-muted mvp-muted--compact">
+                    <a
+                      href="https://metamask.io/download/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Télécharger MetaMask
+                    </a>
+                  </p>
+                )}
+              </div>
+            )}
             <button
               type="button"
-              className="mvp-btn mvp-btn--primary"
+              className="mvp-btn mvp-btn--primary mvp-btn--block mvp-mt"
               onClick={connect}
               disabled={connecting}
             >
-              {connecting ? "Connexion…" : "Connecter le portefeuille"}
+              {connecting ? (
+                <span className="mvp-btn__loading">
+                  <span className="mvp-spinner mvp-spinner--inline" aria-hidden />
+                  Connexion…
+                </span>
+              ) : (
+                "Connecter le portefeuille"
+              )}
             </button>
           </>
         ) : (

@@ -1,21 +1,30 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import MvpLayout from "./layout/MvpLayout.jsx";
+import { useWallet } from "./context/WalletContext.jsx";
+import { useUserRole } from "./hooks/useUserRole.js";
+import AuthenticatedLayout from "./layout/AuthenticatedLayout.jsx";
+import GuestLayout from "./layout/GuestLayout.jsx";
+import DashboardRouter from "./pages/DashboardRouter.jsx";
 import WalletConnectPage from "./pages/WalletConnectPage.jsx";
-import PatientDashboard from "./pages/PatientDashboard.jsx";
-import ProviderDashboard from "./pages/ProviderDashboard.jsx";
-import InsurerDashboard from "./pages/InsurerDashboard.jsx";
+
+function ConnectedApp() {
+  const { role, loading } = useUserRole();
+
+  return (
+    <AuthenticatedLayout role={role} roleLoading={loading}>
+      <DashboardRouter role={role} loading={loading} />
+    </AuthenticatedLayout>
+  );
+}
 
 export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<MvpLayout />}>
-        <Route index element={<Navigate to="/patient" replace />} />
-        <Route path="connect" element={<WalletConnectPage />} />
-        <Route path="patient" element={<PatientDashboard />} />
-        <Route path="provider" element={<ProviderDashboard />} />
-        <Route path="insurer" element={<InsurerDashboard />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/patient" replace />} />
-    </Routes>
-  );
+  const { isConnected } = useWallet();
+
+  if (!isConnected) {
+    return (
+      <GuestLayout>
+        <WalletConnectPage />
+      </GuestLayout>
+    );
+  }
+
+  return <ConnectedApp />;
 }

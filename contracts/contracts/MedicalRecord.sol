@@ -5,15 +5,12 @@ import "./interfaces/IAccess.sol";
 
 contract MedicalRecord {
 
-    // ─────────────────────────────────────────
-    //  ENUMS
-    // ─────────────────────────────────────────
+    
+    
 
     enum RecordType { Consultation, Prescription, LabResult, Imaging, Surgery, Other }
 
-    // ─────────────────────────────────────────
-    //  STRUCTS
-    // ─────────────────────────────────────────
+ 
 
     struct Record {
         uint256 id;
@@ -26,9 +23,7 @@ contract MedicalRecord {
         bool    isValid;       // false si révoqué
     }
 
-    // ─────────────────────────────────────────
-    //  STATE
-    // ─────────────────────────────────────────
+
 
     IAccess public accessControl;
 
@@ -45,9 +40,6 @@ contract MedicalRecord {
 
 
 
-    // ─────────────────────────────────────────
-    //  MODIFIERS
-    // ─────────────────────────────────────────
 
     modifier onlyDoctor() {
         require(accessControl.isDoctor(msg.sender), "MedicalRecord: caller is not a doctor");
@@ -93,18 +85,13 @@ event MedicalRecordRevoked(
         uint256 timestamp
     );
     
-    // ─────────────────────────────────────────
-    //  CONSTRUCTOR
-    // ─────────────────────────────────────────
+ 
 
     constructor(address _accessControl) {
         require(_accessControl != address(0), "MedicalRecord: invalid access control address");
         accessControl = IAccess(_accessControl);
     }
-
-    // ─────────────────────────────────────────
-    //  WRITE FUNCTIONS
-    // ─────────────────────────────────────────
+─
 
     /**
      * @notice Le médecin dépose un dossier médical lié à un patient.

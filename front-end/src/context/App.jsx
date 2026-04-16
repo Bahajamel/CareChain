@@ -1,10 +1,10 @@
 // src/App.jsx
 import { useWallet } from "./context/WalletContext";
-import WalletConnectPage  from "./pages/WalletConnectPage";
+import WalletConnectPage  from "../pages/WalletConnectPage";
 //import AdminDashboard     from "./pages/AdminDashboard";
-import InsurerDashboard   from "./pages/InsurerDashboard";
-import ProviderDashboard  from "./pages/ProviderDashboard";
-import PatientDashboard   from "./pages/PatientDashboard";
+import InsurerDashboard   from "../pages/InsurerDashboard";
+import ProviderDashboard  from "../pages/ProviderDashboard";
+import PatientDashboard   from "../pages/PatientDashboard";
 
 export default function App() {
   const { isConnected, role, roleLoading, address } = useWallet();
