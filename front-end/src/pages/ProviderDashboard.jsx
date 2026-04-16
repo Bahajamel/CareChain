@@ -16,20 +16,15 @@ export default function ProviderDashboard() {
   function handleOnChain() {
     if (!lastClaimId) return;
     const hash = setClaimOnChainDemo(lastClaimId);
-    setOnChainMsg(
-      `Simulation enregistrement on-chain — tx (démo) : ${hash}. Remplacez par l’appel réel au contrat (ethers + ABI) quand il sera prêt.`
-    );
+    setOnChainMsg(hash);
   }
 
   return (
     <div className="mvp-page">
-      <h1 className="mvp-page__title">Espace prestataire</h1>
-      <p className="mvp-page__intro">
-        Téléversez un document médical, renseignez le patient, le type d&apos;acte
-        et le montant. Les données partent vers votre backend (Pinata / IPFS).
-        Ensuite, déclenchez l&apos;étape on-chain (simulation tant que le contrat
-        n&apos;est pas branché).
-      </p>
+      <h1 className="mvp-page__title">
+        <span className="mvp-page__icon">🏥</span>
+        Espace prestataire
+      </h1>
 
       <div className="mvp-card">
         <h2 className="mvp-card__title">Nouvel acte médical</h2>
@@ -37,21 +32,24 @@ export default function ProviderDashboard() {
       </div>
 
       {lastClaimId && (
-        <div className="mvp-card">
-          <h2 className="mvp-card__title">Enregistrement on-chain</h2>
-          <p className="mvp-muted">
-            Après succès IPFS, votre collègue smart contracts exposera une
-            fonction (ex. <code>createRecord(metadataHash, …)</code>). Ici :
-            simulation locale pour la démo MVP.
-          </p>
+        <div className="mvp-card mvp-card--compact">
+          <div className="mvp-card__row">
+            <span className="mvp-badge-success">✓ Dossier créé</span>
+            <span className="mvp-card__id">ID: {lastClaimId}</span>
+          </div>
           <button
             type="button"
-            className="mvp-btn mvp-btn--primary"
+            className="mvp-btn-mini mvp-btn-mini--chain"
             onClick={handleOnChain}
           >
-            Lancer la création du record (simulation)
+            ⛓️ Enregistrer sur la blockchain
           </button>
-          {onChainMsg && <p className="mvp-ok mvp-mt">{onChainMsg}</p>}
+          {onChainMsg && (
+            <div className="mvp-tx-success">
+              <span className="mvp-tx-success__icon">✓</span>
+              <span className="mvp-tx-success__hash">{onChainMsg}</span>
+            </div>
+          )}
         </div>
       )}
     </div>

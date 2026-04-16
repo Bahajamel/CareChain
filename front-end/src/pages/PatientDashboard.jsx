@@ -17,13 +17,23 @@ export default function PatientDashboard() {
     [claims, address]
   );
 
+  // Statistiques
+  const stats = useMemo(() => {
+    const total = mine.length;
+    const approved = mine.filter(c => c.status === "approved").length;
+    const pending = mine.filter(c => c.status === "pending").length;
+    const rejected = mine.filter(c => c.status === "rejected").length;
+    return { total, approved, pending, rejected };
+  }, [mine]);
+
   return (
     <div className="mvp-page">
-      <h1 className="mvp-page__title">Espace patient</h1>
+      <h1 className="mvp-page__title">
+        <span className="mvp-page__icon">👤</span>Espace patient</h1>
       <p className="mvp-page__intro">
         Consultez vos dossiers médicaux déposés par un prestataire, le statut de
-        traitement par l&apos;assureur et le montant remboursé lorsque la
-        demande est approuvée.
+        traitement par l'assureur et le montant remboursé lorsque la demande est
+        approuvée.
       </p>
 
       {!isConnected && (
@@ -36,56 +46,93 @@ export default function PatientDashboard() {
       )}
 
       {isConnected && mine.length === 0 && (
-        <p className="mvp-muted">Aucun dossier pour cette adresse pour l’instant.</p>
+        <div className="mvp-empty-state">
+          <p className="mvp-muted">Aucun dossier pour cette adresse pour l'instant.</p>
+        </div>
       )}
 
       {isConnected && mine.length > 0 && (
-        <div className="mvp-table-wrap">
-          <table className="mvp-table">
-            <thead>
-              <tr>
-                <th>Acte</th>
-                <th>Montant</th>
-                <th>Statut demande</th>
-                <th>Remboursement</th>
-                <th>IPFS</th>
-              </tr>
-            </thead>
-            <tbody>
+        <>
+          {/* Cartes statistiques */}
+          <div className="mvp-stats-grid">
+            <div className="mvp-stat-card">
+              <div className="mvp-stat-card__value">{stats.total}</div>
+              <div className="mvp-stat-card__label">Dossiers totaux</div>
+            </div>
+            <div className="mvp-stat-card mvp-stat-card--approved">
+              <div className="mvp-stat-card__value">{stats.approved}</div>
+              <div className="mvp-stat-card__label">Approuvés</div>
+            </div>
+            <div className="mvp-stat-card mvp-stat-card--pending">
+              <div className="mvp-stat-card__value">{stats.pending}</div>
+              <div className="mvp-stat-card__label">En attente</div>
+            </div>
+            <div className="mvp-stat-card mvp-stat-card--rejected">
+              <div className="mvp-stat-card__value">{stats.rejected}</div>
+              <div className="mvp-stat-card__label">Refusés</div>
+            </div>
+          </div>
+
+          {/* Section dossiers actifs */}
+          <div className="mvp-section">
+            <h2 className="mvp-section__title">Dossiers actifs</h2>
+            <div className="mvp-cards-list">
               {mine.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.actType}</td>
-                  <td>{c.amount}</td>
-                  <td>
-                    <span className={`mvp-tag mvp-tag--${c.status}`}>
+                <div key={c.id} className="mvp-claim-card">
+                  <div className="mvp-claim-card__header">
+                    <span className={`mvp-status-badge mvp-status-badge--${c.status}`}>
                       {c.status === "pending" && "En attente"}
                       {c.status === "approved" && "Approuvé"}
                       {c.status === "rejected" && "Refusé"}
                     </span>
-                  </td>
-                  <td>
-                    {c.status === "approved"
-                      ? `${c.amount} (MVP — même base que la demande)`
-                      : "—"}
-                  </td>
-                  <td>
-                    {c.metadataUrl ? (
-                      <a
-                        href={c.metadataUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Métadonnées
-                      </a>
-                    ) : (
-                      "—"
+                  </div>
+                  
+                  <div className="mvp-claim-card__body">
+                    <div className="mvp-claim-field">
+                      <span className="mvp-claim-field__label">ACTE MÉDICAL</span>
+                      <span className="mvp-claim-field__value">{c.actType}</span>
+                    </div>
+                    
+                    <div className="mvp-claim-field">
+                      <span className="mvp-claim-field__label">MONTANT</span>
+                      <span className="mvp-claim-field__value">{c.amount} €</span>
+                    </div>
+                    
+                    <div className="mvp-claim-field">
+                      <span className="mvp-claim-field__label">STATUT</span>
+                      <span className="mvp-claim-field__value">
+                        {c.status === "pending" && "En attente"}
+                        {c.status === "approved" && "Approuvé"}
+                        {c.status === "rejected" && "Refusé"}
+                      </span>
+                    </div>
+                    
+                    <div className="mvp-claim-field">
+                      <span className="mvp-claim-field__label">REMBOURSEMENT</span>
+                      <span className="mvp-claim-field__value mvp-claim-field__value--amount">
+                        {c.status === "approved" ? `${c.amount} €` : "—"}
+                      </span>
+                    </div>
+                    
+                    {c.metadataUrl && (
+                      <div className="mvp-claim-field">
+                        <span className="mvp-claim-field__label">Métadonnées</span>
+                        <a
+                          href={c.metadataUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mvp-link"
+                        >
+                          Voir les métadonnées
+                        </a>
+                      </div>
                     )}
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import { uploadMedicalRecord } from "../api/client.js";
 import { useWallet } from "../context/WalletContext.jsx";
 
-/**
- * Formulaire prestataire : envoi au backend (IPFS + métadonnées).
- * parent peut passer onSuccess(apiResponse, formSnapshot)
- */
 export default function UploadMedicalRecord({ onSuccess }) {
   const { address } = useWallet();
   const [form, setForm] = useState({
@@ -35,7 +31,7 @@ export default function UploadMedicalRecord({ onSuccess }) {
       return;
     }
     if (!form.providerAddress.trim()) {
-      setErr("Adresse prestataire requise (connectez le portefeuille ou saisissez-la).");
+      setErr("Adresse prestataire requise");
       return;
     }
     setLoading(true);
@@ -44,8 +40,16 @@ export default function UploadMedicalRecord({ onSuccess }) {
       const data = await uploadMedicalRecord(form, file);
       const snapshot = { ...form };
       onSuccess?.(data, snapshot);
+      // Reset form
+      setForm({
+        patientAddress: "",
+        providerAddress: address || "",
+        actType: "",
+        amount: "",
+      });
+      setFile(null);
     } catch (e) {
-      setErr(e.message || "Échec de l’envoi au backend.");
+      setErr(e.message || "Échec de l'envoi.");
     } finally {
       setLoading(false);
     }
@@ -53,80 +57,94 @@ export default function UploadMedicalRecord({ onSuccess }) {
 
   return (
     <form className="mvp-form" onSubmit={onSubmit}>
-      <label className="mvp-label">Adresse patient (wallet)</label>
-      <p className="mvp-form-hint">
-        À saisir pour la personne concernée. En démo solo : utilisez le bouton
-        ci-dessous pour mettre votre propre adresse et voir le dossier dans
-        l’onglet Patient.
-      </p>
-      <input
-        className="mvp-input"
-        value={form.patientAddress}
-        onChange={(e) => setField("patientAddress", e.target.value)}
-        placeholder="0x…"
-        autoComplete="off"
-        required
-      />
-      {address && (
-        <button
-          type="button"
-          className="mvp-btn mvp-btn--ghost mvp-btn--small mvp-btn--block"
-          onClick={() => setField("patientAddress", address)}
-        >
-          Remplir avec mon portefeuille (test patient)
-        </button>
-      )}
+      <div className="mvp-field-group">
+        <label className="mvp-label">Patient</label>
+        <div className="mvp-field-with-btn">
+          <input
+            className="mvp-input"
+            value={form.patientAddress}
+            onChange={(e) => setField("patientAddress", e.target.value)}
+            placeholder="0x..."
+            required
+          />
+          {address && (
+            <button
+              type="button"
+              className="mvp-btn-mini mvp-btn-mini--fill"
+              onClick={() => setField("patientAddress", address)}
+            >
+              👤 Moi
+            </button>
+          )}
+        </div>
+        <span className="mvp-hint">Adresse wallet du patient</span>
+      </div>
 
-      <label className="mvp-label">Adresse prestataire (wallet)</label>
-      <p className="mvp-form-hint">
-        Pré-remplie avec votre portefeuille : c’est le médecin / établissement
-        qui envoie l’acte au backend.
-      </p>
-      <input
-        className="mvp-input"
-        value={form.providerAddress}
-        onChange={(e) => setField("providerAddress", e.target.value)}
-        placeholder="0x…"
-        autoComplete="off"
-        required
-      />
+      <div className="mvp-field-group">
+        <label className="mvp-label">Prestataire</label>
+        <input
+          className="mvp-input"
+          value={form.providerAddress}
+          onChange={(e) => setField("providerAddress", e.target.value)}
+          placeholder="0x..."
+          required
+          disabled={!!address}
+        />
+        <span className="mvp-hint">Votre adresse wallet</span>
+      </div>
 
-      <label className="mvp-label">Type d&apos;acte</label>
-      <input
-        className="mvp-input"
-        value={form.actType}
-        onChange={(e) => setField("actType", e.target.value)}
-        placeholder="Consultation, imagerie…"
-        required
-      />
+      <div className="mvp-row-2cols">
+        <div className="mvp-field-group">
+          <label className="mvp-label">Acte médical</label>
+          <input
+            className="mvp-input"
+            value={form.actType}
+            onChange={(e) => setField("actType", e.target.value)}
+            placeholder="Consultation générale"
+            required
+          />
+        </div>
 
-      <label className="mvp-label">Montant</label>
-      <input
-        className="mvp-input"
-        type="number"
-        min="0"
-        step="any"
-        value={form.amount}
-        onChange={(e) => setField("amount", e.target.value)}
-        required
-      />
+        <div className="mvp-field-group">
+          <label className="mvp-label">Montant (€)</label>
+          <input
+            className="mvp-input"
+            type="number"
+            min="0"
+            step="any"
+            value={form.amount}
+            onChange={(e) => setField("amount", e.target.value)}
+            placeholder="0.00"
+            required
+          />
+        </div>
+      </div>
 
-      <label className="mvp-label">Document (PDF, PNG, JPEG — max 5 Mo)</label>
-      <input
-        type="file"
-        accept=".pdf,.png,.jpg,.jpeg,image/png,image/jpeg,application/pdf"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-        required
-      />
+      <div className="mvp-field-group">
+        <label className="mvp-label">Document</label>
+        <div className="mvp-file-input">
+          <input
+            type="file"
+            id="file-upload"
+            accept=".pdf,.png,.jpg,.jpeg"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="file-upload" className="mvp-file-label">
+            📄 {file ? file.name : "Choisir un fichier"}
+          </label>
+        </div>
+        <span className="mvp-hint">PDF, PNG ou JPG (max 5 Mo)</span>
+      </div>
 
-      {err && <p className="mvp-error">{err}</p>}
+      {err && <div className="mvp-error-msg">{err}</div>}
 
       <button
         type="submit"
-        className="mvp-btn mvp-btn--primary"
+        className="mvp-btn mvp-btn--primary mvp-btn--full"
         disabled={loading}
       >
-        {loading ? "Envoi au backend…" : "Envoyer au backend (IPFS)"}
+        {loading ? "⏳ Envoi en cours..." : "📤 Envoyer"}
       </button>
     </form>
   );

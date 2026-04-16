@@ -329,3 +329,381 @@ code {
   background: #fee2e2;
   color: #991b1b;
 }
+
+
+/* Statistiques */
+.mvp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mvp-stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.mvp-stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.mvp-stat-card__label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.mvp-stat-card--approved .mvp-stat-card__value {
+  color: #10b981;
+}
+
+.mvp-stat-card--pending .mvp-stat-card__value {
+  color: #f59e0b;
+}
+
+.mvp-stat-card--rejected .mvp-stat-card__value {
+  color: #ef4444;
+}
+
+/* Section */
+.mvp-section {
+  margin-top: 1rem;
+}
+
+.mvp-section__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Cartes des dossiers */
+.mvp-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mvp-claim-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.mvp-claim-card__header {
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mvp-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.mvp-status-badge--approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.mvp-status-badge--pending {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.mvp-status-badge--rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.mvp-claim-card__body {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.mvp-claim-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mvp-claim-field__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.mvp-claim-field__value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.mvp-claim-field__value--amount {
+  font-weight: 700;
+  color: #10b981;
+}
+
+.mvp-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.mvp-link:hover {
+  text-decoration: underline;
+}
+
+.mvp-empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .mvp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .mvp-claim-card__body {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+
+/* Cartes pour les dossiers à traiter */
+.mvp-claim-card--pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.mvp-claim-card--history {
+  opacity: 0.85;
+}
+
+.mvp-claim-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-wrap: wrap;
+}
+
+/* Boutons personnalisés */
+.mvp-btn--approved {
+  background: #10b981;
+  color: white;
+  border: none;
+  flex: 1;
+  min-width: 100px;
+}
+
+.mvp-btn--approved:hover {
+  background: #059669;
+}
+
+.mvp-btn--rejected {
+  background: #ef4444;
+  color: white;
+  border: none;
+  flex: 1;
+  min-width: 100px;
+}
+
+.mvp-btn--rejected:hover {
+  background: #dc2626;
+}
+
+.mvp-btn--close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0 0.5rem;
+}
+
+.mvp-btn--close:hover {
+  color: #1e293b;
+}
+
+/* Panneau des métadonnées */
+.mvp-card--meta {
+  margin-top: 1rem;
+  background: #f1f5f9;
+  border-left: 4px solid #3b82f6;
+}
+
+.mvp-meta-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.mvp-pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.5rem;
+}
+
+/* Ajustements responsive */
+@media (max-width: 640px) {
+  .mvp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .mvp-claim-card__actions {
+    flex-direction: column;
+  }
+  
+  .mvp-btn--approved,
+  .mvp-btn--rejected,
+  .mvp-btn--ghost {
+    width: 100%;
+  }
+}
+
+/* Monospace pour les adresses */
+.mvp-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+/* Ajustement du nombre de cartes stats pour l'assureur */
+@media (min-width: 768px) {
+  .mvp-stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 767px) and (min-width: 481px) {
+  .mvp-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .mvp-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.mvp-page__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mvp-page__icon {
+  font-size: 1.5rem;
+}
+
+
+/* Espace entre label et input */
+.mvp-field-group {
+  margin-bottom: 1rem;
+}
+
+.mvp-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 0.5rem;  /* Espace entre le titre et l'input */
+}
+
+.mvp-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: white;
+  transition: all 0.2s;
+}
+
+.mvp-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.mvp-hint {
+  display: block;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;  /* Espace entre l'input et l'indice */
+}
+
+/* Espacement dans les colonnes */
+.mvp-row-2cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;  /* Espace entre les deux colonnes */
+  margin-bottom: 0;
+}
+
+.mvp-row-2cols .mvp-field-group {
+  margin-bottom: 1rem;
+}
+
+/* Bouton avec espacement */
+.mvp-btn--full {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.mvp-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.mvp-logo {
+  display: flex;
+  align-items: center;
+}
+
+.mvp-logo__svg {
+  color: #3b82f6;
+}
+
