@@ -5,7 +5,9 @@ import {
   CARE_TYPE_OPTIONS,
   CLAIM_STATUS_LABELS,
   POLICY_STATUS_LABELS,
+  eurosToCentimes,
   formatAddr,
+  formatEuros,
   ts,
 } from "../insuranceUi.js";
 
@@ -97,9 +99,8 @@ export default function InsurerDashboard() {
       return;
     }
     const patient = policyForm.patient.trim();
-    const coverageAmount = BigInt(
-      Math.max(0, Math.floor(Number(policyForm.coverageAmount)))
-    );
+    // UI en euros, on-chain en centimes
+    const coverageAmount = eurosToCentimes(policyForm.coverageAmount);
     const coverageRate = BigInt(
       Math.min(100, Math.max(1, Math.floor(Number(policyForm.coverageRate))))
     );
@@ -202,12 +203,12 @@ export default function InsurerDashboard() {
             required
             disabled={policyBusy}
           />
-          <label className="mvp-label">Plafond de couverture (unité entière, ex. €)</label>
+          <label className="mvp-label">Plafond de couverture (€)</label>
           <input
             className="mvp-input"
             type="number"
-            min="1"
-            step="1"
+            min="0.01"
+            step="0.01"
             value={policyForm.coverageAmount}
             onChange={(e) => setField("coverageAmount", e.target.value)}
             required
@@ -300,8 +301,8 @@ export default function InsurerDashboard() {
                   <td>#{Number(raw.policyId)}</td>
                   <td>#{Number(raw.recordId)}</td>
                   <td className="mvp-mono">{formatAddr(raw.patient)}</td>
-                  <td>{raw.amountRequested.toString()}</td>
-                  <td>{raw.amountApproved.toString()}</td>
+                  <td>{formatEuros(raw.amountRequested)}</td>
+                  <td>{formatEuros(raw.amountApproved)}</td>
                   <td>
                     <div className="mvp-row-btns">
                       <button
@@ -389,7 +390,7 @@ export default function InsurerDashboard() {
                       </span>
                     </td>
                     <td>
-                      {Number(raw.status) === 1 ? raw.amountApproved.toString() : "—"}
+                      {Number(raw.status) === 1 ? formatEuros(raw.amountApproved) : "—"}
                     </td>
                     <td>{ts(raw.decidedAt)}</td>
                   </tr>
@@ -451,8 +452,8 @@ function PolicySummaryList({ policyContract, ids }) {
             <tr key={id}>
               <td>#{id}</td>
               <td className="mvp-mono">{formatAddr(p.patient)}</td>
-              <td>{p.coverageAmount.toString()}</td>
-              <td>{p.usedAmount.toString()}</td>
+              <td>{formatEuros(p.coverageAmount)}</td>
+              <td>{formatEuros(p.usedAmount)}</td>
               <td>{p.coverageRate.toString()}</td>
               <td>{POLICY_STATUS_LABELS[Number(p.status)] ?? p.status}</td>
               <td>{ts(p.endDate)}</td>

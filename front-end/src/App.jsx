@@ -1,14 +1,30 @@
-import { useWallet } from "./context/WalletContext";
-import DashboardRouter from "./pages/DashboardRouter";
+import { useWallet } from "./context/WalletContext.jsx";
+import { useUserRole } from "./hooks/useUserRole.js";
+import AuthenticatedLayout from "./layout/AuthenticatedLayout.jsx";
+import GuestLayout from "./layout/GuestLayout.jsx";
+import DashboardRouter from "./pages/DashboardRouter.jsx";
+import WalletConnectPage from "./pages/WalletConnectPage.jsx";
 
-function App() {
-  const { connect, isConnected } = useWallet();
+function ConnectedApp() {
+  const { role, loading } = useUserRole();
 
-  if (!isConnected) {
-    return <button onClick={connect}>Connect Wallet</button>;
-  }
-
-  return <DashboardRouter />;
+  return (
+    <AuthenticatedLayout role={role} roleLoading={loading}>
+      <DashboardRouter role={role} loading={loading} />
+    </AuthenticatedLayout>
+  );
 }
 
-export default App;
+export default function App() {
+  const { isConnected } = useWallet();
+
+  if (!isConnected) {
+    return (
+      <GuestLayout>
+        <WalletConnectPage />
+      </GuestLayout>
+    );
+  }
+
+  return <ConnectedApp />;
+}

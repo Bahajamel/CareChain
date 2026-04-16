@@ -71,3 +71,23 @@ export async function uploadMedicalRecord(fields, file) {
   }
   return data;
 }
+
+/**
+ * Récupère un JSON depuis IPFS via une gateway publique.
+ * Note: pour les anciens enregistrements, le CID peut pointer vers un fichier (PDF/image),
+ * pas un JSON — dans ce cas, l'appel échouera et l'appelant doit gérer.
+ */
+export async function fetchIpfsJson(cid, options = {}) {
+  const gatewayBase = options.gatewayBase ?? "https://ipfs.io/ipfs";
+  const clean = String(cid || "").trim();
+  if (!clean) throw new Error("CID manquant");
+  let base = String(gatewayBase).trim();
+  if (base.endsWith("/")) base = base.slice(0, -1);
+  const url = `${base}/${clean}`;
+  const res = await fetch(url, { method: "GET" });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data) {
+    throw new Error(`IPFS fetch failed (${res.status})`);
+  }
+  return data;
+}

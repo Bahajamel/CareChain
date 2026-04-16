@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWallet } from "../context/WalletContext.jsx";
 import {
   useClaimContract,
   useMedicalRecord,
   usePolicyContract,
 } from "../hooks/useContract.js";
+import { fetchIpfsJson } from "../api/client.js";
 import {
+  CARE_TO_RECORD_COMPAT,
   CLAIM_STATUS_LABELS,
   CARE_TYPE_OPTIONS,
   POLICY_STATUS_LABELS,
   RECORD_TYPE_LABELS,
+  eurosToCentimes,
   formatAddr,
+  formatEuros,
   ts,
 } from "../insuranceUi.js";
 
@@ -23,6 +27,7 @@ export default function PatientDashboard() {
   const [policies, setPolicies] = useState([]);
   const [records, setRecords] = useState([]);
   const [claims, setClaims] = useState([]);
+  const [recordMeta, setRecordMeta] = useState({}); // recordId -> metadata JSON
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
@@ -34,7 +39,7 @@ export default function PatientDashboard() {
   const [submitBusy, setSubmitBusy] = useState(false);
   const [submitMsg, setSubmitMsg] = useState(null);
   const [submitErr, setSubmitErr] = useState(null);
-  const [simulated, setSimulated] = useState(null);
+  const [simulated, setSimulated] = useState(null); // bigint (centimes)
 
   const loadData = useCallback(async () => {
     if (!address || !policyContract || !claimContract || !medicalRecord) return;
@@ -90,19 +95,90 @@ export default function PatientDashboard() {
     loadData();
   }, [loadData]);
 
+  // Charge les métadonnées IPFS (montant, actType, etc.) depuis r.ipfsHash (CID).
+  useEffect(() => {
+    if (!records.length) return undefined;
+    let cancelled = false;
+
+    (async () => {
+      for (const { id, r } of records) {
+        if (cancelled) return;
+        if (Object.prototype.hasOwnProperty.call(recordMeta, id)) continue;
+        const cid = r?.ipfsHash;
+        if (!cid) continue;
+        try {
+          const meta = await fetchIpfsJson(cid);
+          if (cancelled) return;
+          setRecordMeta((prev) => ({ ...prev, [id]: meta }));
+        } catch {
+          // anciens records: ipfsHash peut être le documentCid (PDF/image) => pas de JSON
+          if (cancelled) return;
+          setRecordMeta((prev) => ({ ...prev, [id]: null }));
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [records, recordMeta]);
+
+  function findActivePolicyById(idNumber) {
+    return activePolicies.find((row) => row.id === idNumber) || null;
+  }
+
+  function findRecordById(idNumber) {
+    return records.find((row) => row.id === idNumber) || null;
+  }
+
+  function isPolicyRecordCompatible(policy, record) {
+    if (!policy || !record) return false;
+    const careType = Number(policy.p.careType);
+    const recordType = Number(record.r.recordType);
+    const allowed = CARE_TO_RECORD_COMPAT[careType];
+    if (!Array.isArray(allowed)) return true;
+    return allowed.includes(recordType);
+  }
+
+  function getCompatibleRecordsForSelectedPolicy() {
+    const pidNum = Number(claimForm.policyId);
+    const policy = Number.isFinite(pidNum) ? findActivePolicyById(pidNum) : null;
+    if (!policy) return records;
+    return records.filter((row) => isPolicyRecordCompatible(policy, row));
+  }
+
+  const activePolicies = policies.filter((x) => x.active);
+  const compatibleRecords = getCompatibleRecordsForSelectedPolicy();
+
+  const recordsSorted = useMemo(
+    () => records.slice().sort((a, b) => b.id - a.id),
+    [records]
+  );
+
   async function onSimulate() {
     setSubmitErr(null);
     setSimulated(null);
     if (!claimContract) return;
-    const policyId = BigInt(Math.floor(Number(claimForm.policyId)));
+    const policyIdNum = Number(claimForm.policyId);
+    const policyId = BigInt(Math.floor(policyIdNum));
     const amountCentimes = eurosToCentimes(claimForm.amountEuros);
     if (policyId <= 0n || amountCentimes <= 0n) {
       setSubmitErr("Police et montant requis pour la simulation.");
       return;
     }
+    const policy = findActivePolicyById(policyIdNum);
+    if (!policy) {
+      setSubmitErr("Police invalide ou inactive.");
+      return;
+    }
     try {
       const v = await claimContract.simulateReimbursement(policyId, amountCentimes);
-      setSimulated(v.toString());
+      setSimulated(v);
+      if (v === 0n && amountCentimes > 0n) {
+        setSubmitErr(
+          "Le montant demandé ne génère aucun remboursement pour cette police (plafond déjà atteint ou taux nul)."
+        );
+      }
     } catch (e) {
       console.error(e);
       setSubmitErr(e?.shortMessage || e?.reason || e?.message || "Simulation impossible");
@@ -117,8 +193,10 @@ export default function PatientDashboard() {
       setSubmitErr("Connectez le portefeuille patient.");
       return;
     }
-    const policyId = BigInt(Math.floor(Number(claimForm.policyId)));
-    const recordId = BigInt(Math.floor(Number(claimForm.recordId)));
+    const policyIdNum = Number(claimForm.policyId);
+    const recordIdNum = Number(claimForm.recordId);
+    const policyId = BigInt(Math.floor(policyIdNum));
+    const recordId = BigInt(Math.floor(recordIdNum));
     const amountCentimes = eurosToCentimes(claimForm.amountEuros);
 
     if (policyId <= 0n) {
@@ -131,6 +209,23 @@ export default function PatientDashboard() {
     }
     if (amountCentimes <= 0n) {
       setSubmitErr("Montant invalide.");
+      return;
+    }
+
+    const selectedPolicy = findActivePolicyById(policyIdNum);
+    const selectedRecord = findRecordById(recordIdNum);
+    if (!selectedPolicy) {
+      setSubmitErr("Police invalide ou inactive.");
+      return;
+    }
+    if (!selectedRecord) {
+      setSubmitErr("Dossier médical introuvable.");
+      return;
+    }
+    if (!isPolicyRecordCompatible(selectedPolicy, selectedRecord)) {
+      setSubmitErr(
+        "Cette police n'est pas compatible avec le type de dossier médical sélectionné."
+      );
       return;
     }
 
@@ -151,7 +246,6 @@ export default function PatientDashboard() {
     }
   }
 
-  const activePolicies = policies.filter((x) => x.active);
 
   return (
     <div className="mvp-page">
@@ -168,7 +262,12 @@ export default function PatientDashboard() {
       )}
 
       {err && <p className="mvp-error">{err}</p>}
-      {loading && <p className="mvp-muted">Chargement…</p>}
+      {loading && (
+        <p className="mvp-muted mvp-loading-caption" aria-live="polite">
+          <span className="mvp-spinner mvp-spinner--inline" aria-hidden />
+          Chargement des données on-chain…
+        </p>
+      )}
 
       <h2 className="mvp-section-title">Mes polices d&apos;assurance</h2>
       {!loading && policies.length === 0 && isConnected && (
@@ -198,13 +297,54 @@ export default function PatientDashboard() {
                     {CARE_TYPE_OPTIONS.find((o) => o.value === Number(p.careType))?.label ??
                       `#${p.careType}`}
                   </td>
-                  <td>{p.coverageAmount.toString()}</td>
-                  <td>{p.usedAmount.toString()}</td>
+                  <td>{formatEuros(p.coverageAmount)}</td>
+                  <td>{formatEuros(p.usedAmount)}</td>
                   <td>{p.coverageRate.toString()}</td>
                   <td>{POLICY_STATUS_LABELS[Number(p.status)] ?? p.status}</td>
                   <td>{active ? "Oui" : "Non"}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <h2 className="mvp-section-title">Mes dossiers médicaux</h2>
+      {!loading && records.length === 0 && isConnected && (
+        <p className="mvp-muted">Aucun dossier — un médecin doit en déposer un.</p>
+      )}
+      {records.length > 0 && (
+        <div className="mvp-table-wrap">
+          <table className="mvp-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Montant</th>
+                <th>Médecin</th>
+                <th>CID / IPFS</th>
+                <th>Date</th>
+                <th>Valide</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recordsSorted.map(({ id, r }) => (
+                  <tr key={id}>
+                    <td>#{id}</td>
+                    <td>{RECORD_TYPE_LABELS[Number(r.recordType)] ?? r.recordType}</td>
+                    <td>
+                      {recordMeta[id]?.amount != null
+                        ? `${Number(recordMeta[id].amount).toLocaleString()} €`
+                        : "—"}
+                    </td>
+                    <td className="mvp-mono">{formatAddr(r.doctor)}</td>
+                    <td className="mvp-mono" title={r.ipfsHash}>
+                      {String(r.ipfsHash || "—")}
+                    </td>
+                    <td>{ts(r.timestamp)}</td>
+                    <td>{r.isValid ? "Oui" : "Non"}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -230,7 +370,7 @@ export default function PatientDashboard() {
             </option>
             {activePolicies.map(({ id, p }) => (
               <option key={id} value={String(id)}>
-                #{id} — plafond {p.coverageAmount.toString()} —{" "}
+                #{id} — plafond {formatEuros(p.coverageAmount)} —{" "}
                 {CARE_TYPE_OPTIONS.find((o) => o.value === Number(p.careType))?.label ??
                   "soins"}
               </option>
@@ -243,12 +383,14 @@ export default function PatientDashboard() {
             value={claimForm.recordId}
             onChange={(e) => setClaimForm((f) => ({ ...f, recordId: e.target.value }))}
             required
-            disabled={submitBusy || records.length === 0}
+            disabled={submitBusy || compatibleRecords.length === 0}
           >
             <option value="">
-              {records.length === 0 ? "Aucun dossier — un médecin doit en déposer" : "— Choisir —"}
+              {compatibleRecords.length === 0
+                ? "Aucun dossier compatible avec la police sélectionnée"
+                : "— Choisir —"}
             </option>
-            {records.map(({ id, r }) => (
+            {compatibleRecords.map(({ id, r }) => (
               <option key={id} value={String(id)}>
                 #{id} — {RECORD_TYPE_LABELS[Number(r.recordType)] ?? r.recordType} —{" "}
                 {formatAddr(r.doctor)}
@@ -270,7 +412,7 @@ export default function PatientDashboard() {
 
           {simulated != null && (
             <p className="mvp-ok">
-              Remboursement estimé (centimes) : <strong>{simulated}</strong>
+              Remboursement estimé : <strong>{formatEuros(simulated)}</strong>
             </p>
           )}
           {submitErr && <p className="mvp-error">{submitErr}</p>}
@@ -327,8 +469,8 @@ export default function PatientDashboard() {
                   <td>#{id}</td>
                   <td>#{Number(c.policyId)}</td>
                   <td>#{Number(c.recordId)}</td>
-                  <td>{c.amountRequested.toString()}</td>
-                  <td>{c.amountApproved.toString()}</td>
+                  <td>{formatEuros(c.amountRequested)}</td>
+                  <td>{formatEuros(c.amountApproved)}</td>
                   <td>
                     <span className={`mvp-tag mvp-tag--${claimStatusClass(c.status)}`}>
                       {CLAIM_STATUS_LABELS[Number(c.status)] ?? c.status}
@@ -352,8 +494,4 @@ function claimStatusClass(status) {
   return "pending";
 }
 
-function eurosToCentimes(eurosStr) {
-  const n = Number(String(eurosStr).replace(",", "."));
-  if (!Number.isFinite(n) || n <= 0) return 0n;
-  return BigInt(Math.round(n * 100));
-}
+// eurosToCentimes est maintenant centralisé dans insuranceUi.js

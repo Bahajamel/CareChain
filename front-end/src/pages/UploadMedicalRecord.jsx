@@ -59,27 +59,27 @@ export default function UploadMedicalRecord({ onSuccess }) {
     setErr(null);
 
     try {
-      // ── ETAPE 1 : Upload IPFS via backend ──────────────────
+     
       setStep(" Upload du document sur IPFS...");
       const result = await uploadMedicalRecord(form, file);
-      const { documentCid, fileHash } = result.data;
+      const { documentCid, metadataCid, fileHash } = result.data;
 
-      // S'assurer que fileHash a le préfixe 0x
+    
     const fileHashBytes32 = fileHash.startsWith("0x") 
   ? fileHash 
   : `0x${fileHash}`;
 
-      console.log("IPFS upload OK :", documentCid);
+      console.log("IPFS upload OK — documentCid:", documentCid);
+      console.log("IPFS upload OK — metadataCid:", metadataCid);
       console.log("fileHash       :", fileHash);
 
-      // ── ETAPE 2 : Appel addRecord() via MetaMask ───────────
       setStep(" Enregistrement sur la blockchain (MetaMask)...");
 
       const recordType = RECORD_TYPE_MAP[form.actType] ?? 5;
-      // ↑ convertit "Consultation" → 0, "Prescription" → 1, etc.
 
       console.log("patient:", form.patientAddress.trim());
-      console.log("ipfsHash:", documentCid);
+
+      console.log("ipfsHash(metadataCid):", metadataCid);
       console.log("fileHash:", fileHashBytes32);
       console.log("recordType:", recordType);
       console.log("RECORD_TYPE_MAP:", RECORD_TYPE_MAP);
@@ -92,20 +92,18 @@ export default function UploadMedicalRecord({ onSuccess }) {
         console.log("pas de signer:", e.message);
 }
       const tx = await medicalRecord.addRecord(
-        form.patientAddress.trim(), // adresse du patient
-        documentCid,                // ipfsHash
-        fileHashBytes32,                   // fileHash keccak256
-        recordType                  // enum RecordType
+        form.patientAddress.trim(), 
+        metadataCid || documentCid, 
+        fileHashBytes32,                   
+        recordType                  
       );
-      // ↑ MetaMask s'ouvre et demande confirmation au Doctor
 
       setStep("⏳ Transaction en cours de validation...");
       const receipt = await tx.wait();
-      // ↑ attend que la transaction soit minée
 
       console.log("Transaction minée :", receipt.hash);
 
-      // ── ETAPE 3 : Récupérer le recordId depuis l'event ─────
+  
       const iface    = medicalRecord.interface;
       const event    = receipt.logs
         .map(log => { try { return iface.parseLog(log); } catch { return null; } })
@@ -116,7 +114,7 @@ export default function UploadMedicalRecord({ onSuccess }) {
 
       setStep("✅ Dossier médical enregistré !");
 
-      // ── ETAPE 4 : Notifier le parent ───────────────────────
+    
       onSuccess?.({
         ...result,
         data: {
@@ -133,7 +131,6 @@ export default function UploadMedicalRecord({ onSuccess }) {
   console.error("Data:", e?.data);
   console.error("Error args:", e?.revert?.args);
   
-  // Pour décoder le revert manuellement
   if (e?.data) {
     try {
       const decoded = medicalRecord.interface.parseError(e.data);
