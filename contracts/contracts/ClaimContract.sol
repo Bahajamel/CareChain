@@ -8,16 +8,8 @@ import "./interfaces/IMedical.sol";
 
 contract ClaimContract {
 
-    // ─────────────────────────────────────────
-    //  ENUMS
-    // ─────────────────────────────────────────
 
     enum Status { Pending, Approved, Rejected }
-
-    // ─────────────────────────────────────────
-    //  STRUCTS
-    // ─────────────────────────────────────────
-
     struct Claim {
         uint256 id;
         uint256 policyId;
@@ -31,10 +23,6 @@ contract ClaimContract {
         uint256 createdAt;
         uint256 decidedAt;
     }
-
-    // ─────────────────────────────────────────
-    //  STATE
-    // ─────────────────────────────────────────
 
     IAccess public accessControl;
     IPolicy public policyContract;
@@ -163,7 +151,7 @@ contract ClaimContract {
             "ClaimContract: claim already submitted for this record and policy"
         );
 
-        // ── Calcul du remboursement ─────────────────────────────────
+        // Calcul du remboursement 
         uint256 amountApproved = _calculateReimbursement(policyId, amountRequested);
 
         _claimCounter++;

@@ -16,9 +16,9 @@ async function main() {
     `💰 Solde     : ${ethers.formatEther(await ethers.provider.getBalance(deployer.address))} ETH\n`
   );
 
-  // ─────────────────────────────────────────────
+
   // 1. AccessControl
-  // ─────────────────────────────────────────────
+ 
   console.log("1️⃣  Déploiement de AccessControl...");
   const AccessControl = await ethers.getContractFactory("AccessControl");
   const accessControl = await AccessControl.deploy();
@@ -26,9 +26,9 @@ async function main() {
   const accessControlAddress = await accessControl.getAddress();
   console.log(`   ✅ AccessControl déployé : ${accessControlAddress}\n`);
 
-  // ─────────────────────────────────────────────
+
   // 2. MedicalRecord  (dépend de AccessControl)
-  // ─────────────────────────────────────────────
+
   console.log("2️⃣  Déploiement de MedicalRecord...");
   const MedicalRecord = await ethers.getContractFactory("MedicalRecord");
   const medicalRecord = await MedicalRecord.deploy(accessControlAddress);
@@ -36,9 +36,9 @@ async function main() {
   const medicalRecordAddress = await medicalRecord.getAddress();
   console.log(`   ✅ MedicalRecord déployé : ${medicalRecordAddress}\n`);
 
-  // ─────────────────────────────────────────────
+  
   // 3. PolicyContract  (dépend de AccessControl)
-  // ─────────────────────────────────────────────
+
   console.log("3️⃣  Déploiement de PolicyContract...");
   const PolicyContract = await ethers.getContractFactory("PolicyContract");
   const policyContract = await PolicyContract.deploy(accessControlAddress);
@@ -46,9 +46,9 @@ async function main() {
   const policyContractAddress = await policyContract.getAddress();
   console.log(`   ✅ PolicyContract déployé : ${policyContractAddress}\n`);
 
-  // ─────────────────────────────────────────────
+
   // 4. ClaimContract  (dépend des 3 précédents)
-  // ─────────────────────────────────────────────
+ 
   console.log("4️⃣  Déploiement de ClaimContract...");
   const ClaimContract = await ethers.getContractFactory("ClaimContract");
   const claimContract = await ClaimContract.deploy(
@@ -60,17 +60,17 @@ async function main() {
   const claimContractAddress = await claimContract.getAddress();
   console.log(`   ✅ ClaimContract déployé : ${claimContractAddress}\n`);
 
-  // ─────────────────────────────────────────────
+ 
   // 5. Liaison PolicyContract ↔ ClaimContract
-  // ─────────────────────────────────────────────
+
   console.log("🔗 Liaison PolicyContract ↔ ClaimContract...");
   const tx = await policyContract.setClaimContract(claimContractAddress);
   await tx.wait();
   console.log("   ✅ setClaimContract() appelé avec succès\n");
 
-  // ─────────────────────────────────────────────
+
   // 6. Résumé des adresses
-  // ─────────────────────────────────────────────
+ 
   const addresses = {
     network: (await ethers.provider.getNetwork()).name,
     deployer: deployer.address,
@@ -86,9 +86,9 @@ async function main() {
   console.log("📋 Adresses des contrats déployés :");
   console.table(addresses.contracts);
 
-  // ─────────────────────────────────────────────
+
   // 7. Export → deployment.json  (pour le backend)
-  // ─────────────────────────────────────────────
+
   const outputDir = path.join(__dirname, "..", "deployments");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -98,9 +98,9 @@ async function main() {
   fs.writeFileSync(outputPath, JSON.stringify(addresses, null, 2));
   console.log(`\n💾 deployment.json sauvegardé → ${outputPath}`);
 
-  // ─────────────────────────────────────────────
+
   // 8. Copie des ABIs → deployments/abis/  (pour le backend & frontend)
-  // ─────────────────────────────────────────────
+
   const abiDir = path.join(outputDir, "abis");
   if (!fs.existsSync(abiDir)) {
     fs.mkdirSync(abiDir, { recursive: true });

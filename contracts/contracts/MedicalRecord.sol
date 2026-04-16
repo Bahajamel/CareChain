@@ -160,9 +160,8 @@ event MedicalRecordRevoked(
         emit MedicalRecordRevoked(recordId, msg.sender, block.timestamp);
     }
 
-    // ─────────────────────────────────────────
+   
     //  READ FUNCTIONS
-    // ─────────────────────────────────────────
 
     /**
      * @notice Récupère un dossier médical complet.
