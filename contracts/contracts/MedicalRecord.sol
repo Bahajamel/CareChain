@@ -91,7 +91,7 @@ event MedicalRecordRevoked(
         require(_accessControl != address(0), "MedicalRecord: invalid access control address");
         accessControl = IAccess(_accessControl);
     }
-─
+
 
     /**
      * @notice Le médecin dépose un dossier médical lié à un patient.
